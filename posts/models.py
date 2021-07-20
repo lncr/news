@@ -9,3 +9,6 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post_detail_url', kwargs={'id': self.id})
+
+    def get_update_url(self):
+        return reverse('post_update_url', kwargs={'id': self.id})

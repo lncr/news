@@ -1,5 +1,5 @@
 from django.views import View
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, reverse
 from posts.models import Post
 from posts.forms import PostForm
 
@@ -25,3 +25,32 @@ class PostCreateView(View):
             post = form.save()
             return redirect(post)
         return render(request, 'posts/post_create.html', context={'form': form})
+
+
+class PostUpdateView(View):
+
+    def get(self, request, id):
+        post = get_object_or_404(Post, id=id)
+        bound_form = PostForm(instance=post)
+        return render(request, 'posts/post_update.html', context={'form': bound_form, 
+                                                                  'post': post})
+
+    def post(self, request, id):
+        post = get_object_or_404(Post, id=id)
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            post = form.save()
+            return redirect(post)
+        return render(request, 'posts/post_update.html', context={'form': form, 'post': post})
+
+
+class PostDeleteView(View):
+
+    def get(self, request, id):
+        post = get_object_or_404(Post, id=id)
+        return render(request, 'posts/post_delete.html', context={'post': post})
+
+    def post(self, request, id):
+        post = get_object_or_404(Post, id=id)
+        post.delete()
+        return redirect(reverse('posts_list_url'))
