@@ -2,6 +2,8 @@ from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from posts.models import Post
 from posts.forms import PostForm
+from comments.forms import CommentForm
+
 
 def posts_list_view(request):
     posts = Post.objects.all()
@@ -10,7 +12,20 @@ def posts_list_view(request):
 
 def post_detail_view(request, id):
     post = get_object_or_404(Post, id=id)
-    return render(request, 'posts/post_detail.html', context={'post': post})
+    comments = post.comments.filter(active=True)
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.post = post
+            new_comment.save()
+    else:
+        comment_form = CommentForm()
+    return render(request,
+                  'posts/post_detail.html',
+                  {'post': post,
+                   'comments': comments,
+                   'comment_form': comment_form})
 
 
 class PostCreateView(View):

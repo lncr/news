@@ -7,7 +7,7 @@
 
 {% block content %}
 
-<form method="post">
+<form action="{{ post.get_delete_url }}" method="post">
     {% csrf_token %}
     <h3>
         Do you really want to delete post - <b>{{ post.title }}</b>
