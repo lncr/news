@@ -13,8 +13,11 @@
     <nav class="navbar navbar-light bg-light">
         <div class="container-fluid">
           <a class="navbar-brand">NEWS</a>
-          <form class="d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <form action="{% url 'posts_list_url' %}" method="post" class="d-flex">
+            {% csrf_token %}
+            {% for field in search_form %}
+                {{ field }}
+            {% endfor %}
             <button class="btn btn-outline-success" type="submit">Search</button>
           </form>
         </div>

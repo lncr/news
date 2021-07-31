@@ -1,27 +1,40 @@
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from posts.models import Post
-from posts.forms import PostForm
+from posts.forms import PostForm, SearchForm
 from comments.forms import CommentForm
 
 
 def posts_list_view(request):
-    posts = Post.objects.all()
-    return render(request, 'posts/index.html', context={'posts': posts})
-
+    if request.method == 'GET':
+        posts = Post.objects.all()
+        return render(request, 'posts/index.html', context={'posts': posts})
+    elif request.method == 'POST':
+        search_form = SearchForm(request.POST)
+        if search_form.is_valid():
+            search_param = search_form.cleaned_data['search_param']
+            filtered_posts = Post.objects.filter(title__icontains=search_param)
+            return render(request, 'posts/index.html', context={'posts': filtered_posts})
+            
 
 def post_detail_view(request, id):
     post = get_object_or_404(Post, id=id)
-    comments = post.comments.filter(active=True)
+    comments = post.comments.filter(is_active=True)
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
             new_comment = comment_form.save(commit=False)
             new_comment.post = post
             new_comment.save()
+            return render(request,
+                    'posts/post_detail.html',
+                    {'post': post,
+                    'comments': comments,
+                    'comment_form': comment_form,
+                    'new_comment': new_comment})
     else:
         comment_form = CommentForm()
-    return render(request,
+        return render(request,
                   'posts/post_detail.html',
                   {'post': post,
                    'comments': comments,

@@ -5,13 +5,15 @@
 {% endblock %}
 
 {% block content %}
-<h1>Hello World</h1>
+<h1>{{ post.title }}</h1>
+    <div>{{post.body}}</div>
     <a href="{% url 'post_update_url' id=post.id %}">Редактировать</a>
     <a href="{% url 'post_delete_url' id=post.id %}">Удалит</a>
     <hr>
 {% with comments.count as total_comments %}
     <h2>{{ total_comments }} comment{{ total_comments|pluralize }}</h2>
 {% endwith %}
+
 {% for comment in comments %}
     <div class="comment">
         <p class="info">
@@ -22,6 +24,7 @@
 {% empty %}
     <p>There are no comments yet.</p>
 {% endfor %}
+
 
 {% if new_comment %}
     <h2>Your comment has been added.</h2>
